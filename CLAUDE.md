@@ -9,3 +9,9 @@ where it lives --- `fly.toml`, the `Dockerfile`, the CI workflow and
 [course website](https://comp.anu.edu.au/courses/comp4020-agentic-coding-studio/)
 publishes this deliverable's brief and spec. Read them before you plan or build;
 what the agent needs to carry from any of it is your call.
+
+## Process
+
+Commit as you go, in small, real steps --- this is graded. Never commit a
+state where `pnpm check` is red. `pnpm check:evidence` is the last gate before
+submitting; run it, don't just assume `pnpm check` covers it.
