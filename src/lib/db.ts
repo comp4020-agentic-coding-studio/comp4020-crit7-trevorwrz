@@ -1,10 +1,10 @@
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import Database from "better-sqlite3";
-import { desc } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import { type Message, messages } from "./schema";
+import { type Course, type Selection, courses, selections } from "./schema";
 
 // One SQLite file is the app's whole persistent state. In production
 // fly.toml points DATABASE_PATH at the machine's volume (/data), which is
@@ -24,12 +24,58 @@ export const db = drizzle(client);
 // commit the migration it writes to drizzle/.
 migrate(db, { migrationsFolder: "./drizzle" });
 
-export type { Message };
-
-export function listMessages(): Message[] {
-  return db.select().from(messages).orderBy(desc(messages.id)).limit(50).all();
+// The catalogue is seeded, not migrated: it's sample timetable data standing
+// in for what a real system would import from the enrolment office, and it
+// only needs to exist once per (throwaway or real) database.
+if (db.select().from(courses).all().length === 0) {
+  db.insert(courses)
+    .values([
+      { code: "COMP2100", title: "Software Design Methodologies", day: "Mon", startTime: "10:00", endTime: "12:00", room: "Hanna Neumann 1.30" },
+      { code: "COMP3610", title: "Principles of Programming Languages", day: "Mon", startTime: "10:00", endTime: "12:00", room: "CSIT N101" },
+      { code: "COMP3600", title: "Algorithms", day: "Tue", startTime: "09:00", endTime: "11:00", room: "Manning Clark 1" },
+      { code: "COMP4020", title: "Agentic Coding Studio", day: "Wed", startTime: "14:00", endTime: "15:30", room: "Marie Reay 4.03" },
+      { code: "COMP3120", title: "Advanced Databases", day: "Wed", startTime: "14:30", endTime: "16:00", room: "CSIT N103" },
+      { code: "COMP2550", title: "Studio 2: Building Reliable Software", day: "Thu", startTime: "13:00", endTime: "15:00", room: "Birch 101" },
+    ])
+    .run();
 }
 
-export function addMessage(body: string): Message {
-  return db.insert(messages).values({ body }).returning().get();
+export type { Course, Selection };
+
+export function listCourses(): Course[] {
+  return db.select().from(courses).orderBy(courses.day, courses.startTime).all();
+}
+
+export type PlannedCourse = Selection & { course: Course; clashesWith: string[] };
+
+// Two sessions clash when they fall on the same day and their time ranges
+// overlap. Comparing the HH:MM strings directly is safe: zero-padded 24-hour
+// strings sort exactly like the times they represent.
+function overlaps(a: Course, b: Course): boolean {
+  return a.day === b.day && a.startTime < b.endTime && b.startTime < a.endTime;
+}
+
+export function listPlan(): PlannedCourse[] {
+  const rows = db
+    .select({ selection: selections, course: courses })
+    .from(selections)
+    .innerJoin(courses, eq(selections.courseId, courses.id))
+    .orderBy(courses.day, courses.startTime)
+    .all();
+
+  return rows.map(({ selection, course }) => ({
+    ...selection,
+    course,
+    clashesWith: rows
+      .filter((other) => other.selection.id !== selection.id && overlaps(course, other.course))
+      .map((other) => other.course.code),
+  }));
+}
+
+export function addSelection(courseId: number): void {
+  db.insert(selections).values({ courseId }).onConflictDoNothing().run();
+}
+
+export function removeSelection(id: number): void {
+  db.delete(selections).where(eq(selections.id, id)).run();
 }
