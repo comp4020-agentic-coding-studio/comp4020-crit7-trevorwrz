@@ -25,9 +25,12 @@ export const db = drizzle(client);
 migrate(db, { migrationsFolder: "./drizzle" });
 
 // The catalogue is seeded, not migrated: it's sample timetable data standing
-// in for what a real system would import from the enrolment office, and it
-// only needs to exist once per (throwaway or real) database.
-if (db.select().from(courses).all().length === 0) {
+// in for what a real system would import from the enrolment office. Each row
+// is keyed on `code` (unique) and inserted with onConflictDoNothing, so this
+// runs safely on every boot -- extending the list here backfills new rows
+// into an already-seeded database (deployed or local) without touching
+// existing rows or any student's saved plan.
+{
   db.insert(courses)
     .values([
       { code: "COMP1100", title: "Introduction to Programming", day: "Mon", startTime: "14:00", endTime: "16:00", room: "Hanna Neumann 1.33" },
@@ -43,6 +46,7 @@ if (db.select().from(courses).all().length === 0) {
       { code: "COMP3530", title: "Advanced Computer Networks", day: "Thu", startTime: "10:00", endTime: "12:00", room: "Ian Ross 1" },
       { code: "COMP4610", title: "Principles of Autonomous Agents", day: "Fri", startTime: "09:00", endTime: "11:00", room: "Manning Clark 2" },
     ])
+    .onConflictDoNothing()
     .run();
 }
 

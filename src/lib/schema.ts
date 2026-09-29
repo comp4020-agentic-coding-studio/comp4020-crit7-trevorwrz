@@ -11,15 +11,19 @@ import { int, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 // The catalogue: every offered course session. Seeded at boot (see db.ts) —
 // this stands in for the part of the real system nobody but the timetabling
 // office edits.
-export const courses = sqliteTable("courses", {
-  id: int().primaryKey({ autoIncrement: true }),
-  code: text().notNull(),
-  title: text().notNull(),
-  day: text().notNull(),
-  startTime: text("start_time").notNull(),
-  endTime: text("end_time").notNull(),
-  room: text().notNull(),
-});
+export const courses = sqliteTable(
+  "courses",
+  {
+    id: int().primaryKey({ autoIncrement: true }),
+    code: text().notNull(),
+    title: text().notNull(),
+    day: text().notNull(),
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+    room: text().notNull(),
+  },
+  (table) => [unique().on(table.code)],
+);
 
 // The plan: the courses you've put yourself into. This is the part of the
 // real system that's all state — add one, and it's still there next reload;
