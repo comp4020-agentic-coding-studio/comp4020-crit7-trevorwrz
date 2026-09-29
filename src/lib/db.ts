@@ -30,12 +30,18 @@ migrate(db, { migrationsFolder: "./drizzle" });
 if (db.select().from(courses).all().length === 0) {
   db.insert(courses)
     .values([
+      { code: "COMP1100", title: "Introduction to Programming", day: "Mon", startTime: "14:00", endTime: "16:00", room: "Hanna Neumann 1.33" },
       { code: "COMP2100", title: "Software Design Methodologies", day: "Mon", startTime: "10:00", endTime: "12:00", room: "Hanna Neumann 1.30" },
       { code: "COMP3610", title: "Principles of Programming Languages", day: "Mon", startTime: "10:00", endTime: "12:00", room: "CSIT N101" },
+      { code: "COMP2600", title: "Formal Methods for Software Engineering", day: "Tue", startTime: "11:00", endTime: "13:00", room: "CSIT N102" },
       { code: "COMP3600", title: "Algorithms", day: "Tue", startTime: "09:00", endTime: "11:00", room: "Manning Clark 1" },
+      { code: "COMP2620", title: "Higher Computing", day: "Wed", startTime: "09:00", endTime: "11:00", room: "CSIT N101" },
       { code: "COMP4020", title: "Agentic Coding Studio", day: "Wed", startTime: "14:00", endTime: "15:30", room: "Marie Reay 4.03" },
       { code: "COMP3120", title: "Advanced Databases", day: "Wed", startTime: "14:30", endTime: "16:00", room: "CSIT N103" },
       { code: "COMP2550", title: "Studio 2: Building Reliable Software", day: "Thu", startTime: "13:00", endTime: "15:00", room: "Birch 101" },
+      { code: "COMP3550", title: "Studio 3: Software Product", day: "Thu", startTime: "15:00", endTime: "17:00", room: "Birch 101" },
+      { code: "COMP3530", title: "Advanced Computer Networks", day: "Thu", startTime: "10:00", endTime: "12:00", room: "Ian Ross 1" },
+      { code: "COMP4610", title: "Principles of Autonomous Agents", day: "Fri", startTime: "09:00", endTime: "11:00", room: "Manning Clark 2" },
     ])
     .run();
 }
