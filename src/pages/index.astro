@@ -28,7 +28,14 @@ const plannedIds = new Set(plan.map((p) => p.courseId));
         in your plan.
       </p>
 
-      <h2>My plan</h2>
+      <div class="section-heading">
+        <h2>My plan</h2>
+        {plan.length > 0 && (
+          <form method="post" action="/api/selections/clear">
+            <button class="secondary">Remove all</button>
+          </form>
+        )}
+      </div>
       {
         plan.length === 0 ? (
           <p>Nothing planned yet — add a course from the catalogue below.</p>
@@ -36,13 +43,15 @@ const plannedIds = new Set(plan.map((p) => p.courseId));
           <ul id="plan">
             {plan.map((p) => (
               <li class={p.clashesWith.length > 0 ? "clash" : ""}>
-                <strong>{p.course.code}</strong> {p.course.title} — {p.course.day}{" "}
-                {p.course.startTime}–{p.course.endTime} ({p.course.room})
-                {p.clashesWith.length > 0 && (
-                  <span class="clash-badge" role="alert">
-                    clashes with {p.clashesWith.join(", ")}
-                  </span>
-                )}
+                <div class="info">
+                  <strong>{p.course.code}</strong> {p.course.title} — {p.course.day}{" "}
+                  {p.course.startTime}–{p.course.endTime} ({p.course.room})
+                  {p.clashesWith.length > 0 && (
+                    <span class="clash-badge" role="alert">
+                      clashes with {p.clashesWith.join(", ")}
+                    </span>
+                  )}
+                </div>
                 <form method="post" action="/api/selections/remove">
                   <input type="hidden" name="id" value={p.id} />
                   <button>Remove</button>
@@ -57,10 +66,12 @@ const plannedIds = new Set(plan.map((p) => p.courseId));
       <ul id="catalogue">
         {courses.map((course) => (
           <li>
-            <strong>{course.code}</strong> {course.title} — {course.day}{" "}
-            {course.startTime}–{course.endTime} ({course.room})
+            <div class="info">
+              <strong>{course.code}</strong> {course.title} — {course.day}{" "}
+              {course.startTime}–{course.endTime} ({course.room})
+            </div>
             {plannedIds.has(course.id) ? (
-              <span>already in your plan</span>
+              <span class="already-planned">already in your plan</span>
             ) : (
               <form method="post" action="/api/selections">
                 <input type="hidden" name="courseId" value={course.id} />

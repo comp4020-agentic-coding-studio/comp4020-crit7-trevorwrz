@@ -46,21 +46,60 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
   padding: 0.6rem 0;
   border-bottom: 1px solid #e2e2e2;
 }
 
+/* The descriptive text (and, for a clashing row, the clash badge) lives in
+   its own flexible block, so the action on the right — Remove, Add to plan,
+   "already in your plan" — always lands in the same place regardless of how
+   long the title is or whether a clash badge is present. */
+#plan li .info,
+#catalogue li .info {
+  flex: 1 1 16rem;
+}
+
+.clash-badge {
+  display: block;
+  color: #b3261e;
+  font-weight: 600;
+}
+
 #plan li form,
 #catalogue li form {
   margin: 0;
+  flex: 0 0 auto;
+}
+
+.already-planned {
+  flex: 0 0 auto;
+  color: #5a5a5a;
+}
+
+.section-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.section-heading h2 {
+  margin: 0;
+}
+
+.section-heading form {
+  margin: 0;
+}
+
+button.secondary {
+  background: none;
+  border: 1px solid #b3261e;
+  color: #b3261e;
 }
 
 .clash {
   background: #fff4f2;
-}
-
-.clash-badge {
-  color: #b3261e;
-  font-weight: 600;
 }

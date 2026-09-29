@@ -89,3 +89,7 @@ export function addSelection(courseId: number): void {
 export function removeSelection(id: number): void {
   db.delete(selections).where(eq(selections.id, id)).run();
 }
+
+export function clearPlan(): void {
+  db.delete(selections).run();
+}
